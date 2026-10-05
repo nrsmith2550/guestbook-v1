@@ -65,8 +65,8 @@ SYNC_DIR = None
 # USB-C earbuds / adapters (e.g. Apple's) show up under their own name instead -
 # run --list-devices and add that name here if the defaults below don't match.
 # Set to None to use the Mac's current default device.
-INPUT_DEVICE = ["External Microphone", "USB-C", "USB Audio", "Headset"]
-OUTPUT_DEVICE = ["External Headphones", "USB-C", "USB Audio", "Headset"]
+INPUT_DEVICE = ["EarPods Microphone", "External Microphone", "USB-C", "USB Audio", "Headset"]
+OUTPUT_DEVICE = ["EarPods", "External Headphones", "USB-C", "USB Audio", "Headset"]
 
 # Which controller button the hook switch is wired to (find it with --test).
 BUTTON_INDEX = 0
