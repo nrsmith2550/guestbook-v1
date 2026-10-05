@@ -60,10 +60,13 @@ RECORDING_DIR = os.path.expanduser("~/Wedding Guestbook Recordings")
 SYNC_DIR = None
 
 # Audio devices, matched by part of their name (see --list-devices).
-# When a headset plug is inserted, macOS usually names these as below.
+# Each can be a single name or a list of names; the first one found is used.
+# A 3.5mm headset plug shows up as "External Microphone" / "External Headphones".
+# USB-C earbuds / adapters (e.g. Apple's) show up under their own name instead -
+# run --list-devices and add that name here if the defaults below don't match.
 # Set to None to use the Mac's current default device.
-INPUT_DEVICE = "External Microphone"
-OUTPUT_DEVICE = "External Headphones"
+INPUT_DEVICE = ["External Microphone", "USB-C", "USB Audio", "Headset"]
+OUTPUT_DEVICE = ["External Headphones", "USB-C", "USB Audio", "Headset"]
 
 # Which controller button the hook switch is wired to (find it with --test).
 BUTTON_INDEX = 0
@@ -206,11 +209,16 @@ def resolve_device(name_part, kind):
     if not name_part:
         return None
     key = "max_input_channels" if kind == "input" else "max_output_channels"
-    for i, dev in enumerate(sd.query_devices()):
-        if name_part.lower() in dev["name"].lower() and dev[key] > 0:
-            return i
-    log.warning(f"!! {kind} device '{name_part}' not found - using the Mac's default. "
-                f"Is the handset plugged in?")
+    names = [name_part] if isinstance(name_part, str) else list(name_part)
+    devices = sd.query_devices()
+    for name in names:
+        for i, dev in enumerate(devices):
+            if name.lower() in dev["name"].lower() and dev[key] > 0:
+                return i
+    available = ", ".join(f"'{d['name']}'" for d in devices if d[key] > 0)
+    log.warning(f"!! No {kind} device matching {names} - using the Mac's default. "
+                f"Available {kind} devices: {available}. "
+                f"Set {'INPUT' if kind == 'input' else 'OUTPUT'}_DEVICE to one of these names.")
     return None
 
 
